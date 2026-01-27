@@ -1,25 +1,17 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using DemoMVC.Models;
 
-namespace DemoMVC.Controllers;
-
-public class DemoController : Controller
+namespace DemoMVC.Controllers
 {
-    public IActionResult Index()
+    public class DemoController : Controller
     {
-        ViewBag.Message = "Xin chào từ Demo Controller";
-        return View();
-    }
+        public IActionResult Index()
+        {
+            ViewBag.Name = "Trần Thị Bích Ngọc";
+            ViewBag.StudentId = "2221050694";
+            ViewBag.Year = 2026;
 
-    public IActionResult Privacy()
-    {
-        return View();
+            return View();
+        
     }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
+}
 }

@@ -1,0 +1,28 @@
+@model DemoMVC.Models.Student
+
+@{
+    ViewData["Title"] = "Nhập thông tin sinh viên";
+}
+
+<h2>Nhập thông tin sinh viên</h2>
+
+<form method="post">
+    <div>
+        <label>Mã sinh viên:</label>
+        <input type="text" name="StudentCode" value="@Model?.StudentCode" required />
+    </div>
+    <br />
+
+    <div>
+        <label>Họ tên:</label>
+        <input type="text" name="FullName" value="@Model?.FullName" required />
+    </div>
+    <br />
+
+    <button type="submit">Gửi</button>
+</form>
+
+@if (ViewBag.Message != null)
+{
+    <h3 style="color: green">@ViewBag.Message</h3>
+}
