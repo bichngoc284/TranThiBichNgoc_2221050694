@@ -13,5 +13,9 @@ namespace DemoMVC.Models
         [Required]
         [Display(Name = "Họ và Tên")]
         public required string FullName { get; set; }
+
+        [Display(Name = "Khoa")]
+        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn khoa")]
+        public int FacultyId { get; set; }
     }
 }

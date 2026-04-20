@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DemoMVC.Models;
 using DemoMVC.Data;
+using DemoMVC.ViewModels;
+using DemoMVC.Models.ViewModels;
 
 namespace DemoMVC.Controllers
 {
@@ -14,10 +17,59 @@ namespace DemoMVC.Controllers
             _context = context;
         }
 
-        // Hiển thị danh sách Students
-        public IActionResult Index()
+        private void PopulateDropDownLists(object? selectedFaculty = null)
         {
-            var students = _context.Students.ToList();
+            var facultiesQuery = _context.Faculties
+                .OrderBy(f => f.Name)
+                .Select(f => new { f.Id, f.Name });
+
+            ViewBag.FacultyId = new SelectList(facultiesQuery, "Id", "Name", selectedFaculty);
+        }
+
+        private List<StudentVM> GetStudentsWithFacultyByLinq(string? searchString, int? facultyId)
+        {
+            var students =
+                from s in _context.Students
+                join f in _context.Faculties on s.FacultyId equals f.Id
+                where (string.IsNullOrEmpty(searchString) || s.FullName.Contains(searchString))
+                      && (!facultyId.HasValue || facultyId.Value == 0 || s.FacultyId == facultyId.Value)
+                orderby s.FullName
+                select new StudentVM
+                {
+                    Id = s.Id,
+                    StudentCode = s.StudentCode,
+                    FullName = s.FullName,
+                    FacultyName = f.Name
+                };
+
+            return students.ToList();
+        }
+
+        private async Task<StudentVM?> GetStudentWithFacultyByLinqAsync(int id)
+        {
+            var student = await (from s in _context.Students
+                                 join f in _context.Faculties on s.FacultyId equals f.Id
+                                 where s.Id == id
+                                 select new StudentVM
+                                 {
+                                     Id = s.Id,
+                                     StudentCode = s.StudentCode,
+                                     FullName = s.FullName,
+                                     FacultyName = f.Name
+                                 })
+                                .FirstOrDefaultAsync();
+
+            return student;
+        }
+
+        // Hiển thị danh sách Students
+        public IActionResult Index(string? searchString, int? facultyId)
+        {
+            PopulateDropDownLists(facultyId);
+            ViewBag.SearchString = searchString;
+            ViewBag.SelectedFacultyId = facultyId;
+
+            var students = GetStudentsWithFacultyByLinq(searchString, facultyId);
             return View(students);
         }
 
@@ -25,6 +77,7 @@ namespace DemoMVC.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            PopulateDropDownLists();
             return View();
         }
 
@@ -39,6 +92,8 @@ namespace DemoMVC.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            PopulateDropDownLists(student.FacultyId);
             return View(student);
         }
 
@@ -55,6 +110,8 @@ namespace DemoMVC.Controllers
             {
                 return NotFound();
             }
+
+            PopulateDropDownLists(student.FacultyId);
             return View(student);
         }
 
@@ -88,12 +145,30 @@ namespace DemoMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            PopulateDropDownLists(student.FacultyId);
             return View(student);
         }
 
         private bool StudentExists(int id)
         {
             return _context.Students.Any(e => e.Id == id);
+        }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var student = await GetStudentWithFacultyByLinqAsync(id.Value);
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            return View(student);
         }
 
         // GET: Students/Delete/5
@@ -104,8 +179,7 @@ namespace DemoMVC.Controllers
                 return NotFound();
             }
 
-            var student = await _context.Students
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var student = await GetStudentWithFacultyByLinqAsync(id.Value);
             if (student == null)
             {
                 return NotFound();

@@ -1,4 +1,4 @@
-@model IEnumerable<DemoMVC.Models.Student>
+@model IEnumerable<DemoMVC.Models.ViewModels.StudentVM>
 
 @{
     ViewData["Title"] = "Danh sách Sinh viên";
@@ -7,21 +7,41 @@
 <h1>@ViewData["Title"]</h1>
 
 <p>
-    <a asp-action="Create">Thêm Sinh viên mới</a>
+    <a asp-action="Create" class="btn btn-primary me-2">Thêm Sinh viên mới</a>
+    <a asp-controller="Faculty" asp-action="Index" class="btn btn-secondary">Quản lý Khoa</a>
 </p>
+
+<form asp-action="Index" method="get" class="form-inline mb-3">
+    <div class="form-group me-2">
+        <input type="text" name="searchString" value="@ViewBag.SearchString" class="form-control" placeholder="Tìm theo tên..." />
+    </div>
+    <div class="form-group me-2">
+        <select name="facultyId" class="form-control">
+            <option value="">-- Chọn Khoa --</option>
+            @foreach (var item in (SelectList)ViewBag.FacultyId)
+            {
+                if (item.Value == (ViewBag.SelectedFacultyId?.ToString() ?? ""))
+                {
+                    <option value="@item.Value" selected>@item.Text</option>
+                }
+                else
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Tìm</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Xóa</a>
+</form>
 
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StudentCode)
-            </th>
+            <th>Id</th>
+            <th>Họ và Tên</th>
+            <th>Mã Sinh viên</th>
+            <th>Khoa</th>
             <th></th>
         </tr>
     </thead>
@@ -29,13 +49,16 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Id)
+                @item.Id
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.FullName)
+                @item.FullName
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.StudentCode)
+                @item.StudentCode
+            </td>
+            <td>
+                @item.FacultyName
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |

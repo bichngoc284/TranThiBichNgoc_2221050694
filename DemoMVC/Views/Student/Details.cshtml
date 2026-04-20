@@ -1,0 +1,36 @@
+@model DemoMVC.Models.ViewModels.StudentVM
+
+@{
+    ViewData["Title"] = "Chi tiết Sinh viên";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <h4>Student</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Mã Sinh viên
+        </dt>
+        <dd class="col-sm-10">
+            @Model.StudentCode
+        </dd>
+        <dt class="col-sm-2">
+            Họ và Tên
+        </dt>
+        <dd class="col-sm-10">
+            @Model.FullName
+        </dd>
+        <dt class="col-sm-2">
+            Khoa
+        </dt>
+        <dd class="col-sm-10">
+            @Model.FacultyName
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Chỉnh sửa</a> |
+    <a asp-action="Index">Quay lại</a>
+</div>

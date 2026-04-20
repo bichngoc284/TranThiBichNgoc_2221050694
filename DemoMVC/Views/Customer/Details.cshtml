@@ -1,0 +1,70 @@
+@model DemoMVC.Models.Customer
+
+@{
+    ViewData["Title"] = "Chi tiết khách hàng";
+}
+
+<h1>Chi tiết khách hàng</h1>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <p><strong>Tên:</strong> @Model.Name</p>
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Số điện thoại:</strong> @Model.Phone</p>
+    </div>
+</div>
+
+<!-- 👇 DANH SÁCH ĐƠN HÀNG CỦA KHÁCH HÀNG -->
+@if (Model.Orders != null && Model.Orders.Any())
+{
+    <h3>Danh sách đơn hàng (@Model.Orders.Count)</h3>
+    
+    @foreach (var order in Model.Orders)
+    {
+        <div class="card mb-3">
+            <div class="card-header bg-light">
+                <strong>Đơn hàng #@order.Id</strong> - @order.OrderDate.ToString("dd/MM/yyyy HH:mm")
+            </div>
+            <div class="card-body">
+                @if (order.OrderDetails != null && order.OrderDetails.Any())
+                {
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Tên sản phẩm</th>
+                                <th style="width: 15%; text-align: center;">Số lượng</th>
+                                <th style="width: 20%; text-align: right;">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var detail in order.OrderDetails)
+                            {
+                                <tr>
+                                    <td>@detail.Product?.Name</td>
+                                    <td style="text-align: center;">@detail.Quantity</td>
+                                    <td style="text-align: right;">
+                                        <strong>@((detail.Quantity * detail.Price).ToString("N0")) VND</strong>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="text-end mt-3 pt-2 border-top">
+                        <h5>Tổng tiền: <strong class="text-success">@order.TotalAmount.ToString("N0") VND</strong></h5>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-info">
+        Khách hàng này chưa có đơn hàng nào.
+    </div>
+}
+
+<div class="mt-4">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Chỉnh sửa</a>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</div>

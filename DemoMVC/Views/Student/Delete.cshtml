@@ -1,4 +1,4 @@
-@model DemoMVC.Models.Student
+@model DemoMVC.Models.ViewModels.StudentVM
 
 @{
     ViewData["Title"] = "Xóa Sinh viên";
@@ -12,21 +12,27 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FullName)
+            Mã Sinh viên
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FullName)
+            @Model.StudentCode
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentCode)
+            Họ và Tên
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StudentCode)
+            @Model.FullName
+        </dd>
+        <dt class = "col-sm-2">
+            Khoa
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.FacultyName
         </dd>
     </dl>
-    
+
     <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
+        <input type="hidden" name="id" value="@Model.Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
