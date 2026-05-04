@@ -1,0 +1,61 @@
+<div class="container mt-4">
+    <h2 class="mb-4">
+        <i class="bi bi-check-circle text-success"></i> Kết quả Import Sinh Viên
+    </h2>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-people"></i> Đã Import</h5>
+                    <p class="card-text display-4">@ViewBag.ImportedCount</p>
+                    <p class="card-text">sinh viên</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-exclamation-triangle"></i> Lỗi</h5>
+                    <p class="card-text display-4">@ViewBag.ErrorCount</p>
+                    <p class="card-text">dòng</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (ViewBag.Errors != null && ((List<string>)ViewBag.Errors).Any())
+    {
+        <div class="card border-danger mt-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-x-circle"></i> Danh sách lỗi</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    @foreach (var error in (List<string>)ViewBag.Errors)
+                    {
+                        <li class="list-group-item list-group-item-danger">
+                            <i class="bi bi-exclamation-mark-circle"></i> @error
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+
+    @if (ViewBag.Success != null)
+    {
+        <div class="alert alert-success mt-4">
+            <i class="bi bi-check-all"></i> @ViewBag.Success
+        </div>
+    }
+
+    <div class="mt-4">
+        <a asp-action="Index" asp-controller="Student" class="btn btn-primary">
+            <i class="bi bi-list"></i> Danh sách Sinh Viên
+        </a>
+        <a asp-action="Upload" class="btn btn-secondary">
+            <i class="bi bi-arrow-repeat"></i> Import thêm
+        </a>
+    </div>
+</div>

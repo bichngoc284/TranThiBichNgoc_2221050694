@@ -5,6 +5,7 @@ using DemoMVC.Models;
 using DemoMVC.Data;
 using DemoMVC.ViewModels;
 using DemoMVC.Models.ViewModels;
+using OfficeOpenXml;
 
 namespace DemoMVC.Controllers
 {
@@ -72,7 +73,60 @@ namespace DemoMVC.Controllers
             var students = GetStudentsWithFacultyByLinq(searchString, facultyId);
             return View(students);
         }
+// IMPORT EXCEL
+[HttpPost]
+public async Task<IActionResult> ImportExcel(IFormFile file)
+{
+    if (file == null || file.Length == 0)
+        return BadRequest("File không hợp lệ");
 
+    using (var stream = new MemoryStream())
+    {
+        await file.CopyToAsync(stream);
+
+        using (var package = new OfficeOpenXml.ExcelPackage(stream))
+        {
+            var worksheet = package.Workbook.Worksheets[0];
+            int rowCount = worksheet.Dimension.Rows;
+
+            for (int row = 2; row <= rowCount; row++)
+            {
+                string studentCode = worksheet.Cells[row, 1].Text;
+                string fullName = worksheet.Cells[row, 2].Text;
+                string facultyText = worksheet.Cells[row, 3].Text;
+
+                if (string.IsNullOrEmpty(studentCode) || string.IsNullOrEmpty(fullName))
+                    continue;
+
+                if (!int.TryParse(facultyText, out int facultyId))
+                    continue;
+
+                // kiểm tra Faculty tồn tại
+                var facultyExists = _context.Faculties.Any(f => f.Id == facultyId);
+                if (!facultyExists)
+                    continue;
+
+                // kiểm tra trùng mã SV
+                var exists = _context.Students.Any(s => s.StudentCode == studentCode);
+                if (exists)
+                    continue;
+
+                var student = new Student
+                {
+                    StudentCode = studentCode,
+                    FullName = fullName,
+                    FacultyId = facultyId
+                };
+
+                _context.Students.Add(student);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    return RedirectToAction(nameof(Index));
+}
         // Hiển thị form nhập dữ liệu
         [HttpGet]
         public IActionResult Create()

@@ -34,7 +34,10 @@
     <button type="submit" class="btn btn-primary">Tìm</button>
     <a asp-action="Index" class="btn btn-secondary ms-2">Xóa</a>
 </form>
-
+<form asp-action="ImportExcel" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" />
+    <button type="submit">Import Excel</button>
+</form>
 <table class="table">
     <thead>
         <tr>
